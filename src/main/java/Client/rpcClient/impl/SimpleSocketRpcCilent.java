@@ -12,6 +12,7 @@ import java.net.UnknownHostException;
 
 /**
  * 基础版的用于客户端通信的代码
+ * sendRequest方法与IOClient方法相同
  */
 public class SimpleSocketRpcCilent implements RpcClient {
 

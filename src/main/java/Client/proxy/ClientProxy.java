@@ -1,6 +1,9 @@
 package Client.proxy;
 
 import Client.IOClient;
+import Client.rpcClient.RpcClient;
+import Client.rpcClient.impl.NettyRpcClient;
+import Client.rpcClient.impl.SimpleSocketRpcCilent;
 import common.Message.RpcRequest;
 import common.Message.RpcResponse;
 import lombok.AllArgsConstructor;
@@ -11,10 +14,24 @@ import java.lang.reflect.Proxy;
 
 @AllArgsConstructor
 public class ClientProxy implements InvocationHandler {
-    //传入参数service接口的class对象，反射封装成一个request
-    //初始化代理类时传入 host 和 port
-    private String host;
-    private int port;
+
+    private RpcClient rpcClient;
+
+//    public ClientProxy(String host, int port, int choose){
+//        switch (choose){
+//            case 0:
+//                rpcClient = new NettyRpcClient(host, port);
+//                System.out.println("使用netty版的客户端...");
+//                break;
+//            case 1:
+//                rpcClient = new SimpleSocketRpcCilent(host, port);
+//                break;
+//        }
+//    }
+
+    public ClientProxy(){
+        rpcClient = new NettyRpcClient();
+    }
 
     //jdk动态代理，每一次代理对象调用方法，都会经过此方法增强（反射获取request对象，socket发送到服务端）
     //核心逻辑，用于封装请求并处理服务端响应。
@@ -26,7 +43,7 @@ public class ClientProxy implements InvocationHandler {
                 .methodName(method.getName())
                 .params(args).paramsType(method.getParameterTypes()).build();
         //与服务端进行通信，将请求发送出去，并接收 RpcResponse 响应。
-        RpcResponse response= IOClient.sendRequest(host,port,request);
+        RpcResponse response= rpcClient.sendRequest(request);
         //获取服务端返回的结果，并返回给调用者。
         return response.getData();
     }

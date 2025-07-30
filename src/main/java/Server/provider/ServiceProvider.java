@@ -1,5 +1,9 @@
 package Server.provider;
 
+import Server.serviceRegister.ServiceRegister;
+import Server.serviceRegister.impl.ZKServiceRegister;
+
+import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,9 +15,16 @@ import java.util.Map;
 public class ServiceProvider {
     // 集合中存放服务的实例，key为实例对象的全类名，value为对应的实例
      private Map<String, Object> interfaceProvider;
+     private int port;
+     private String host;
+     // 注册服务类
+    public ServiceRegister serviceRegister;
 
-     public ServiceProvider(){
+     public ServiceProvider(String host, int port){
+         this.port = port;
+         this.host = host;
          this.interfaceProvider = new HashMap<>();
+         this.serviceRegister = new ZKServiceRegister();
      }
      // 本地注册服务
     public void provideServiceInterface(Object service){ // 接收一个服务实例
@@ -24,7 +35,10 @@ public class ServiceProvider {
         Class<?>[] interfaces = service.getClass().getInterfaces();
         // 3.遍历所有接口，将他注册到interfaceProvider
         for(Class<?> clazz : interfaces){
+            // 本地的映射表
             interfaceProvider.put(clazz.getName(), service);
+            // 在注册中心注册服务
+            serviceRegister.register(clazz.getName(), new InetSocketAddress(host, port));
         }
     }
     // 获取服务
