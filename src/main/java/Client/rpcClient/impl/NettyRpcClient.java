@@ -67,7 +67,7 @@ public class NettyRpcClient implements RpcClient {
             // 获取服务端返回的响应(通过key获取)
             AttributeKey<RpcResponse> key = AttributeKey.valueOf("RPCResponse");
             RpcResponse response = channel.attr(key).get();
-            System.out.println(response);
+            System.out.println("RpcResponse：" + response);
             return response;
         }catch (InterruptedException e){
             e.printStackTrace();

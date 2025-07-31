@@ -1,9 +1,7 @@
 package Client.proxy;
 
-import Client.IOClient;
 import Client.rpcClient.RpcClient;
 import Client.rpcClient.impl.NettyRpcClient;
-import Client.rpcClient.impl.SimpleSocketRpcCilent;
 import common.Message.RpcRequest;
 import common.Message.RpcResponse;
 import lombok.AllArgsConstructor;
@@ -16,18 +14,6 @@ import java.lang.reflect.Proxy;
 public class ClientProxy implements InvocationHandler {
 
     private RpcClient rpcClient;
-
-//    public ClientProxy(String host, int port, int choose){
-//        switch (choose){
-//            case 0:
-//                rpcClient = new NettyRpcClient(host, port);
-//                System.out.println("使用netty版的客户端...");
-//                break;
-//            case 1:
-//                rpcClient = new SimpleSocketRpcCilent(host, port);
-//                break;
-//        }
-//    }
 
     public ClientProxy(){
         rpcClient = new NettyRpcClient();
