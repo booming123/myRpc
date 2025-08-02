@@ -19,6 +19,8 @@ public class ZKServiceRegister implements ServiceRegister {
     //zookeeper根路径节点
     private static final String ROOT_PATH = "MyRPC";
 
+    private static final String RETRY = "CanRetry";
+
     // 负责zookeeper客户端的初始化，并与zookeeper服务端建立连接
     public ZKServiceRegister(){
         // 指数时间重试的策略
@@ -40,7 +42,8 @@ public class ZKServiceRegister implements ServiceRegister {
 
     // 注册服务到注册中心
     @Override
-    public void register(String serviceName, InetSocketAddress serviceAddress){
+    public void register(String serviceName, InetSocketAddress serviceAddress,
+                         boolean canRetry){
         try {
             // 如果根下不存在名为serviceName的节点，则创建永久节点（下线时也不会被删除）
             if(client.checkExists().forPath("/"+serviceName) == null){
@@ -60,6 +63,14 @@ public class ZKServiceRegister implements ServiceRegister {
                     .creatingParentsIfNeeded()
                     .withMode(CreateMode.EPHEMERAL)
                     .forPath(path);
+            // 如果这个服务是幂等性，就增加到节点中
+            if (canRetry){
+                path = "/" + RETRY +"/"+ serviceName;
+                client.create()
+                        .creatingParentsIfNeeded()
+                        .withMode(CreateMode.EPHEMERAL)
+                        .forPath(path);
+            }
         }catch (Exception e){
             System.out.println("该服务已存在");
         }

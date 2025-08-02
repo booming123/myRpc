@@ -27,7 +27,7 @@ public class ServiceProvider {
          this.serviceRegister = new ZKServiceRegister();
      }
      // 本地注册服务
-    public void provideServiceInterface(Object service){ // 接收一个服务实例
+    public void provideServiceInterface(Object service, boolean canRetry){ // 接收一个服务实例
          // 1. 获取服务对象的完整类名
         String serviceName = service.getClass().getName();// 获取服务对象的完整类名
         System.out.println("服务对象的完整类名为: "+serviceName);
@@ -38,7 +38,7 @@ public class ServiceProvider {
             // 本地的映射表
             interfaceProvider.put(clazz.getName(), service);
             // 在注册中心注册服务
-            serviceRegister.register(clazz.getName(), new InetSocketAddress(host, port));
+            serviceRegister.register(clazz.getName(), new InetSocketAddress(host, port), canRetry);
         }
     }
     // 获取服务

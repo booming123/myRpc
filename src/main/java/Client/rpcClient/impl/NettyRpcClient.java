@@ -2,8 +2,8 @@ package Client.rpcClient.impl;
 
 
 import Client.netty.NettyClientInitializer.NettyClientInitializer;
-import Client.netty.serviceCenter.ServiceCenter;
-import Client.netty.serviceCenter.ZKServiceCenter;
+import Client.serviceCenter.ServiceCenter;
+import Client.serviceCenter.ZKServiceCenter;
 import Client.rpcClient.RpcClient;
 import common.Message.RpcRequest;
 import common.Message.RpcResponse;
@@ -31,9 +31,9 @@ public class NettyRpcClient implements RpcClient {
     // 服务中心
     private ServiceCenter serviceCenter;
 
-    public NettyRpcClient(){
+    public NettyRpcClient(ServiceCenter serviceCenter){
        // 从固定端口号和地址改为 zk 传入
-       this.serviceCenter = new ZKServiceCenter();
+       this.serviceCenter = serviceCenter;
     }
 
     // static保证只初始化一次，减少资源消耗

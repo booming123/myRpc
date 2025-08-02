@@ -7,5 +7,6 @@ import java.net.InetSocketAddress;
  */
 public interface ServiceRegister {
     // 注册服务
-    void register(String interfaceName, InetSocketAddress serviceAddress);
+    void register(String interfaceName, InetSocketAddress serviceAddress
+    , boolean canRetry);
 }

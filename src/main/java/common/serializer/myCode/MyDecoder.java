@@ -10,35 +10,39 @@ import java.util.List;
 
 // 自定义的解码器 用于序列化
 public class MyDecoder extends ByteToMessageDecoder {
-    //它负责传入的字节流解码为业务对象，并将解码后的对象添加到out中，供下一个handler处理
-    //ctx是Netty的ChannelHandlerContext对象，提供对管道、通道和事件的访问
-    //in是ByteBuf对象，接收到的字节流，它是netty的缓冲区，可以理解为字节数组
-    //out是List对象，用于存储解码后的对象
+
+    /**
+     * 负责传入的字节流解码为业务对象，并将解码后的对象添加到out中，供下一个handler处理
+     * @param ctx Netty 提供的上下文对象，可用于操作 pipeline、channel
+     * @param in 接收到的字节流（netty的缓冲区）
+     * @param out List对象，用于存储解码后的对象
+     * @throws Exception
+     */
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        //读取消息类型
+        // 1.从字节流中读取前两个字节作为消息类型（使用short是为了节省空间）
         short messageType = in.readShort();
-        //判断是否是请求或响应消息
+        // 2.判断消息类型，是否是请求或响应消息
         if (messageType != MessageType.REQUEST.getCode() &&
                 messageType != MessageType.RESPONSE.getCode()) {
             System.out.println("暂不支持此种数据");
             return;
         }
-        //读取序列化类型
+        // 3.再读两个字节标识序列化方式
         short serializerType = in.readShort();
-        //获取对应的序列化对象，根据类型返回一个适当的序列化器
+        // 4. 获取序列化器
         Serializer serializer = Serializer.getSerializerByType(serializerType);
         if (serializer == null) {
             throw new RuntimeException("不存在对应的序列化器");
         }
-        //读取消息长度和数据
+        // 5.读取消息体长度（4个字节）
         int length = in.readInt();
+        // 6.从字节流ByteBuf中读取length个字节到bytes数组中
         byte[] bytes = new byte[length];
-        //将消息内存序列化后存到字节数组中
         in.readBytes(bytes);
-        //反序列化对象后赋值变量中
+        // 7.反序列化为Java对象
         Object deserialize = serializer.deserialize(bytes, messageType);
-        //将对象添加到out列表中
+        // 8.将解码结果加入到out中
         out.add(deserialize);
     }
 }
