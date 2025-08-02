@@ -1,5 +1,6 @@
 package Server.provider;
 
+import Server.ratelimit.provider.RateLimitProvider;
 import Server.serviceRegister.ServiceRegister;
 import Server.serviceRegister.impl.ZKServiceRegister;
 
@@ -20,11 +21,15 @@ public class ServiceProvider {
      // 注册服务类
     public ServiceRegister serviceRegister;
 
+    // 添加限流器
+    private RateLimitProvider rateLimitProvider;
+
      public ServiceProvider(String host, int port){
          this.port = port;
          this.host = host;
          this.interfaceProvider = new HashMap<>();
          this.serviceRegister = new ZKServiceRegister();
+         this.rateLimitProvider = new RateLimitProvider();
      }
      // 本地注册服务
     public void provideServiceInterface(Object service, boolean canRetry){ // 接收一个服务实例
@@ -44,6 +49,11 @@ public class ServiceProvider {
     // 获取服务
     public Object getService(String interfaceName){
          return interfaceProvider.get(interfaceName);
+    }
+
+    // 获取限流器
+    public RateLimitProvider getRateLimitProvider(){
+        return rateLimitProvider;
     }
 
 }
